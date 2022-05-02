@@ -190,7 +190,7 @@ def turn_knob(args: argparse):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--knob', type=str, default='dragonnet')
-    parser.add_argument('--data-base-dir', type=str, default="../../dat/ihdp/csv")
+    parser.add_argument('--data-base-dir', type=str, default="../../dat/ihdp/csv1")
     parser.add_argument('--output-base-dir', type=str, default="../../result/ihdp")
 
     args = parser.parse_args()

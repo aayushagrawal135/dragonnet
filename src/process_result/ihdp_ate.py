@@ -1,16 +1,20 @@
 import copy
-
+import sys
 from numpy import load
+import os
 
-from semi_parametric_estimation.ate import *
+sys.path.append("..")
 
+from src.semi_parametric_estimation.ate import *
+from src.semi_parametric_estimation.helpers import *
 
 def load_truth(replication, knob):
     """
     loading ground truth data
     """
 
-    file_path = '../../result/{}/{}/simulation_outputs.npz'.format(knob, replication)
+    file_path = "../../result/ihdp/{}/{}/simulation_outputs.npz".format(knob, replication)
+
     data = load(file_path)
     mu_0 = data['mu_0']
     mu_1 = data['mu_1']
@@ -23,8 +27,18 @@ def load_data(knob='default', replication=1, model='baseline', train_test='test'
     loading train test experiment results
     """
 
-    file_path = '../../result/{}/'.format(knob)
-    data = load(file_path + '{}/{}/0_replication_{}.npz'.format(replication, model, train_test))
+    # / Users / aayush / Home / courses / ml / project / dragonnet / result / ihdp / dragonnet / 0 / targeted_regularization
+
+    # file_path = "/Users/aayush/Home/courses/ml/project/dragonnet/result/ihdp/dragonnet/"
+    # file_path += 'result/ihdp/{}/0/baseline/0_replication_{}.npz'.format(knob, train_test)
+    # '{}/{}/0_replication_{}.npz'.format(replication, model, train_test)
+
+
+    # data = load(file_path + '{}/{}/0_replication_{}.npz'.format(replication, model, train_test))
+
+    file_path = "../../result/ihdp/{}/{}/baseline/0_replication_{}.npz".format(knob, replication, train_test)
+
+    data = load(file_path)
 
     return data['q_t0'].reshape(-1, 1), data['q_t1'].reshape(-1, 1), data['g'].reshape(-1, 1), \
            data['t'].reshape(-1, 1), data['y'].reshape(-1, 1), data['index'].reshape(-1, 1), data['eps'].reshape(-1, 1)
@@ -43,12 +57,10 @@ def get_estimate(q_t0, q_t1, g, t, y_dragon, index, eps, truncate_level=0.01):
 
 
 def make_table(train_test='train', n_replication=50):
-    dict = {'tarnet': {'baseline': {'back_door': 0, }, 'targeted_regularization': 0},
-            'dragonnet': {'baseline': 0, 'targeted_regularization': 0},
-            'nednet': {'baseline': 0, 'targeted_regularization': 0}}
+    dict = {'dragonnet': {'baseline': 0, 'targeted_regularization': 0}}
     tmle_dict = copy.deepcopy(dict)
 
-    for knob in ['dragonnet', 'tarnet']:
+    for knob in ['dragonnet']:
         for model in ['baseline', 'targeted_regularization']:
             simple_errors, tmle_errors = [], []
             for rep in range(n_replication):
@@ -73,7 +85,7 @@ def make_table(train_test='train', n_replication=50):
 
 
 def main():
-    dict, tmle_dict = make_table()
+    dict, tmle_dict = make_table(n_replication=1)
     print("The back door adjustment result is below")
     print(dict)
 
